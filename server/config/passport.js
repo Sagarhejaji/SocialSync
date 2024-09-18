@@ -1,54 +1,26 @@
-require("dotenv").config(); // Load environment variables from .env file
-const User = require("../models/user.model");
-const Token = require("../models/token.model");
-const JwtStrategy = require("passport-jwt").Strategy;
-const ExtractJwt = require("passport-jwt").ExtractJwt;
-const passport = require("passport");
-const jwt = require("jsonwebtoken");
+const JwtStrategy = require('passport-jwt').Strategy;
+const ExtractJwt = require('passport-jwt').ExtractJwt;
+const User = require('../models/user.model'); // Adjust path if needed
+const passport = require('passport');
+
+require('dotenv').config(); // Ensure this is added at the top to load .env variables
 
 const opts = {};
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-opts.secretOrKey = process.env.JWT_SECRET;
+opts.secretOrKey = process.env.JWT_SECRET;  // Load the secret from the environment variable
 
 passport.use(
-  new JwtStrategy(opts, async function (jwt_payload, done) {
+  new JwtStrategy(opts, async (jwt_payload, done) => {
     try {
-      const user = await User.findOne({ email: jwt_payload.email });
-
+      const user = await User.findById(jwt_payload.id);
       if (user) {
-        const refreshTokenFromDB = await Token.findOne({ user: user._id });
-
-        if (!refreshTokenFromDB) {
-          return done(null, false);
-        }
-
-        const refreshPayload = jwt.verify(refreshTokenFromDB.refreshToken, process.env.REFRESH_SECRET);
-
-        if (refreshPayload.email !== jwt_payload.email) {
-          return done(null, false);
-        }
-
-        const tokenExpiration = new Date(jwt_payload.exp * 1000);
-        const now = new Date();
-        const timeDifference = tokenExpiration.getTime() - now.getTime();
-
-        if (timeDifference > 0 && timeDifference < 30 * 60 * 1000) {
-          const payloadNew = {
-            _id: user._id,
-            email: user.email,
-          };
-          const newToken = jwt.sign(payloadNew, process.env.JWT_SECRET, { expiresIn: "6h" });
-
-          return done(null, { user, newToken });
-        }
-        return done(null, { user });
+        return done(null, user);
       } else {
         return done(null, false);
       }
-    } catch (err) {
-      return done(err, false);
+    } catch (error) {
+      console.error("Error in JWT strategy:", error);
+      return done(error, false);
     }
   })
 );
-
-module.exports = passport;
