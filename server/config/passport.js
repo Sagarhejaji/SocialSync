@@ -7,7 +7,7 @@ const passport = require("passport");
 const opts = {};
 const jwt = require("jsonwebtoken");
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-opts.secretOrKey = process.env.SECRET;
+opts.secretOrKey = process.env.JWT_SECRET;
 
 passport.use(
   new JwtStrategy(opts, async function (jwt_payload, done) {
