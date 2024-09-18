@@ -1,11 +1,12 @@
-require("dotenv").config();
+require("dotenv").config(); // Load environment variables from .env file
 const User = require("../models/user.model");
 const Token = require("../models/token.model");
-const JwtStrategy = require("passport-jwt").Strategy,
-  ExtractJwt = require("passport-jwt").ExtractJwt;
+const JwtStrategy = require("passport-jwt").Strategy;
+const ExtractJwt = require("passport-jwt").ExtractJwt;
 const passport = require("passport");
-const opts = {};
 const jwt = require("jsonwebtoken");
+
+const opts = {};
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = process.env.JWT_SECRET;
 
@@ -15,18 +16,13 @@ passport.use(
       const user = await User.findOne({ email: jwt_payload.email });
 
       if (user) {
-        const refreshTokenFromDB = await Token.findOne({
-          user: user._id,
-        });
+        const refreshTokenFromDB = await Token.findOne({ user: user._id });
 
         if (!refreshTokenFromDB) {
           return done(null, false);
         }
 
-        const refreshPayload = jwt.verify(
-          refreshTokenFromDB.refreshToken,
-          process.env.REFRESH_SECRET
-        );
+        const refreshPayload = jwt.verify(refreshTokenFromDB.refreshToken, process.env.REFRESH_SECRET);
 
         if (refreshPayload.email !== jwt_payload.email) {
           return done(null, false);
@@ -41,9 +37,7 @@ passport.use(
             _id: user._id,
             email: user.email,
           };
-          const newToken = jwt.sign(payloadNew, process.env.SECRET, {
-            expiresIn: "6h",
-          });
+          const newToken = jwt.sign(payloadNew, process.env.JWT_SECRET, { expiresIn: "6h" });
 
           return done(null, { user, newToken });
         }
@@ -56,3 +50,5 @@ passport.use(
     }
   })
 );
+
+module.exports = passport;
