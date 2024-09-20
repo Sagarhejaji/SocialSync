@@ -1,18 +1,19 @@
-const passport = require('passport');
 const { Strategy, ExtractJwt } = require('passport-jwt');
+const passport = require('passport');
 
-// Configure options for JwtStrategy
 const opts = {
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // Extracts JWT from the authorization header
-    secretOrKey: process.env.JWT_SECRET // Ensure this environment variable is set
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    secretOrKey: process.env.JWT_SECRET, // Ensure this line is present
 };
 
-// Define the JwtStrategy
 const strategy = new Strategy(opts, (jwt_payload, done) => {
-    // Logic to handle successful JWT verification
-    // For example, find the user in your database using jwt_payload.id
-    // done(null, user); or done(null, false);
+    // Your logic to handle the JWT payload and authentication
+    // Example:
+    // User.findById(jwt_payload.id)
+    //     .then(user => {
+    //         return done(null, user);
+    //     })
+    //     .catch(err => done(err, false));
 });
 
-// Use the strategy
 passport.use(strategy);
