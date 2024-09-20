@@ -1,15 +1,33 @@
 const mongoose = require("mongoose");
+mongoose.set("strictQuery", false);
+class Database {
+  constructor(uri, options) {
+    this.uri = uri;
+    this.options = options;
+  }
 
-const connectDB = async () => {
+  async connect() {
     try {
-        await mongoose.connect(process.env.MONGODB_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
-        console.log("MongoDB connected");
+      await mongoose.connect(this.uri, this.options);
+      console.log(
+        `Connected to database: ${mongoose.connection.db.databaseName}`
+      );
     } catch (error) {
-        console.error("Error connecting to database:", error);
+      throw error;
     }
-};
+  }
 
-module.exports = connectDB;
+  async disconnect() {
+    try {
+      await mongoose.disconnect();
+      console.log(
+        `Disconnected from database: ${mongoose.connection.db.databaseName}`
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
+}
+
+module.exports = Database;
+
