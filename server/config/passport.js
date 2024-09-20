@@ -1,26 +1,18 @@
-const JwtStrategy = require('passport-jwt').Strategy;
-const ExtractJwt = require('passport-jwt').ExtractJwt;
-const User = require('../models/user.model'); // Adjust path if needed
 const passport = require('passport');
+const { Strategy, ExtractJwt } = require('passport-jwt');
 
-require('dotenv').config(); // Ensure this is added at the top to load .env variables
+// Configure options for JwtStrategy
+const opts = {
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // Extracts JWT from the authorization header
+    secretOrKey: process.env.JWT_SECRET // Ensure this environment variable is set
+};
 
-const opts = {};
-opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-opts.secretOrKey = process.env.JWT_SECRET;  // Load the secret from the environment variable
+// Define the JwtStrategy
+const strategy = new Strategy(opts, (jwt_payload, done) => {
+    // Logic to handle successful JWT verification
+    // For example, find the user in your database using jwt_payload.id
+    // done(null, user); or done(null, false);
+});
 
-passport.use(
-  new JwtStrategy(opts, async (jwt_payload, done) => {
-    try {
-      const user = await User.findById(jwt_payload.id);
-      if (user) {
-        return done(null, user);
-      } else {
-        return done(null, false);
-      }
-    } catch (error) {
-      console.error("Error in JWT strategy:", error);
-      return done(error, false);
-    }
-  })
-);
+// Use the strategy
+passport.use(strategy);
