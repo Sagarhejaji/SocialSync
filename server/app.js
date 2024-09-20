@@ -6,10 +6,7 @@
  * Email: hejajisagar@gmail.com
  */
 
-require("dotenv").config(); // Load environment variables
-console.log("MONGODB_URI:", process.env.MONGODB_URI); // Check if MongoDB URI is loaded
-console.log("JWT_SECRET:", process.env.JWT_SECRET); // Check if JWT_SECRET is loaded
-//require("dotenv").config();
+require("dotenv").config();
 const express = require("express");
 const adminRoutes = require("./routes/admin.route");
 const userRoutes = require("./routes/user.route");
