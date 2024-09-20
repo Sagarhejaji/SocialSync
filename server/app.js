@@ -6,6 +6,23 @@
  * Email: hejajisagar@gmail.com
  */
 
+require('dotenv').config(); // Load environment variables
+
+console.log('JWT_SECRET:', process.env.JWT_SECRET); // Check if JWT_SECRET is loaded
+
+const express = require('express');
+const passport = require('passport');
+// Other required modules
+
+const app = express();
+
+// Your passport configuration here
+// ...
+
+app.listen(process.env.PORT || 4000, () => {
+    console.log(`Server is running on port ${process.env.PORT || 4000}`);
+});
+
 require("dotenv").config();
 const express = require("express");
 const adminRoutes = require("./routes/admin.route");
