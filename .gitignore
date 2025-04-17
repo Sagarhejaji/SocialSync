@@ -17,6 +17,6 @@ jspm_packages
 .DS_Store
 server/assets/*
 .env
-todo.txt
+/todo.txt/
 .idea
 .vscode
